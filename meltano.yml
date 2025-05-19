@@ -1,0 +1,54 @@
+version: 1
+send_anonymous_usage_stats: true
+project_id: "tap-avoma"
+default_environment: test
+venv:
+  backend: uv
+environments:
+  - name: test
+plugins:
+  extractors:
+    - name: "tap-avoma"
+      namespace: "tap_avoma"
+      pip_url: -e .
+      capabilities:
+        - state
+        - catalog
+        - discover
+        - about
+        - stream-maps
+
+      settings:
+        - name: api_key
+          kind: password
+          label: API Key
+          description: The API key to use for authentication
+          sensitive: true
+
+        - name: from_date
+          kind: date_iso8601
+          label: From Date
+          description: The date to start extracting data from
+
+        - name: to_date
+          kind: date_iso8601
+          label: To Date
+          description: The date to stop extracting data from
+
+        - name: page_size
+          kind: integer
+          label: Page Size
+          description: The number of records to fetch per page
+
+        - name: recording_duration__gte
+          kind: integer
+          label: Recording Duration
+          description: The minimum duration of the recording in seconds
+
+      config:
+        user_agent: "tap-avoma"
+
+  loaders:
+    - name: target-jsonl
+      variant: andyh1203
+      pip_url: target-jsonl
