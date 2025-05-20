@@ -190,9 +190,12 @@ class TranscriptionsStream(AvomaStream):
             params["meeting_uuid"] = context["meeting_uuid"]
         return params
 
-    def post_process(self, row: dict, context: Context | None = None) -> dict:
+    def post_process(self, row: dict, context: Context | None = None) -> dict | None:
         """Post-process the row."""
         row = super().post_process(row, context)
+        if "uuid" not in row:
+            # filter out meetings with no transcriptions
+            return None
         if context:
             row["meeting_uuid"] = context["meeting_uuid"]
             row["meeting_start_at"] = context["meeting_start_at"]
