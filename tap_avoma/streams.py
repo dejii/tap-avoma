@@ -104,7 +104,7 @@ class MeetingsStream(AvomaStream):
         else:
             start = self.get_starting_timestamp(context)
             if start:
-                params["from_date"] = start  # result from last processed record
+                params["from_date"] = start  # incremental sync
             else:
                 params["from_date"] = self.config.get("from_date")
             params["to_date"] = self.config.get("to_date")
@@ -113,6 +113,8 @@ class MeetingsStream(AvomaStream):
                 "recording_duration__gte"
             )
             params["o"] = "start_at"  # ascending
+            if self.config.get("is_internal") is not None:
+                params["is_internal"] = self.config.get("is_internal")
         return params
 
     def get_child_context(

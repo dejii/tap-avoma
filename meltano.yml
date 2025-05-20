@@ -40,6 +40,11 @@ plugins:
           label: Page Size
           description: The number of records to fetch per page
 
+        - name: is_internal
+          kind: boolean
+          label: Is Internal
+          description: Whether or not to sync internal meetings
+
         - name: recording_duration__gte
           kind: integer
           label: Recording Duration

@@ -51,6 +51,11 @@ class TapAvoma(Tap):
             ),
         ),
         th.Property(
+            "is_internal",
+            th.BooleanType(nullable=True),
+            description="Whether or not to sync internal meetings",
+        ),
+        th.Property(
             "api_url",
             th.StringType(nullable=False),
             required=True,
