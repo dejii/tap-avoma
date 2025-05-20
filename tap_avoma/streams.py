@@ -16,10 +16,10 @@ class MeetingsStream(AvomaStream):
 
     name = "meetings"
     path = "/v1/meetings"
-    primary_keys: t.ClassVar[list[str]] = ["uuid"]
     replication_key = "start_at"
     records_jsonpath = "$.results[*]"
     next_page_token_jsonpath = "$.next"  # noqa: S105
+    is_sorted = True
     schema = th.PropertiesList(
         th.Property(
             "attendees",
@@ -137,7 +137,6 @@ class TranscriptionsStream(AvomaStream):
 
     name = "transcriptions"
     path = "/v1/transcriptions"
-    primary_keys: t.ClassVar[list[str]] = ["uuid"]
     replication_key = None
     records_jsonpath = "$[*]"
     parent_stream_type = MeetingsStream
