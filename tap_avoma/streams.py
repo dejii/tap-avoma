@@ -17,7 +17,7 @@ class MeetingsStream(AvomaStream):
     name = "meetings"
     path = "/v1/meetings"
     primary_keys: t.ClassVar[list[str]] = ["uuid"]
-    replication_key = None
+    replication_key = "start_at"
     records_jsonpath = "$.results[*]"
     next_page_token_jsonpath = "$.next"  # noqa: S105
     schema = th.PropertiesList(
@@ -85,7 +85,7 @@ class MeetingsStream(AvomaStream):
 
     def get_url_params(
         self,
-        context: Context | None,  # noqa: ARG002
+        context: Context | None,
         next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
@@ -102,7 +102,11 @@ class MeetingsStream(AvomaStream):
             parsed_url = urlparse(next_page_token)
             params = parse_qs(parsed_url.query)
         else:
-            params["from_date"] = self.config.get("from_date")
+            start = self.get_starting_timestamp(context)
+            if start:
+                params["from_date"] = start  # result from last processed record
+            else:
+                params["from_date"] = self.config.get("from_date")
             params["to_date"] = self.config.get("to_date")
             params["page_size"] = self.config.get("page_size")
             params["recording_duration__gte"] = self.config.get(
@@ -137,8 +141,8 @@ class TranscriptionsStream(AvomaStream):
     replication_key = None
     records_jsonpath = "$[*]"
     parent_stream_type = MeetingsStream
-    ignore_parent_replication_key = True
-    state_partitioning_keys: t.ClassVar[list[str]] = ["meeting_uuid"]
+    state_partitioning_keys: t.ClassVar[list[str]] = []
+    ignore_parent_replication_key = False
     schema = th.PropertiesList(
         th.Property(
             "transcript",
